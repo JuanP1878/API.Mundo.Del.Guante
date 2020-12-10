@@ -14,7 +14,6 @@ router.get("/getOrdenCompra", async (req, res) => {
 
   let result = await BD.Open(sql, [], true);
   Orders = [];
-
   result.rows.map((order) => {
     let orderSchema = {
       ID_orden_C: order[0],
@@ -24,7 +23,16 @@ router.get("/getOrdenCompra", async (req, res) => {
     };
     Orders.push(orderSchema);
   });
-  //console.log(Orders);
+  
+  let result2 = await BD.Open(sql, [], true);
+  for(const order of Orders){
+    sql = `select ID_orden_envio from Orden_de_Envio WHERE ID_orden_C = '${order.ID_orden_C}'`;
+
+    let result = await BD.Open(sql, [], true);
+    order.ID_orden_envio = String(result.rows[0])
+    //console.log(String(result.rows[0]))
+  }
+  //console.log(Orders)
   res.json(Orders);
 });
 
