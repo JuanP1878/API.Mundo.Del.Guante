@@ -199,6 +199,32 @@ router.get("/getProveedor", async (req, res) => {
   res.json(Proveedor);
 });
 
+router.get("/getProductosProveedor", async (req, res) => {
+  let ID_proveedor = req.body.ID_proveedor;
+  sql = `Select * from Puede_Surtir WHERE ID_proveedor = ${ID_proveedor}`;
+
+  let result = await BD.Open(sql, [], true);
+  Productos = [];
+
+  result.rows.map((prov) => {
+    let provSchema = {
+      ID_producto: prov[1],
+      precio : prov[2],
+    };
+    Productos.push(provSchema);
+  });
+
+  let result2 = await BD.Open(sql, [], true);
+  for(const order of Productos){
+    sql = `select nombre from Producto WHERE ID_producto = '${order.ID_producto}'`;
+    let result = await BD.Open(sql, [], true);
+    order.nombre = String(result.rows[0])
+    //console.log(String(result.rows[0]))
+  }
+  //console.log(Productos);
+  res.json(Productos);
+});
+
 router.delete("/deleteProveedor", async (req, res) => {
   let id = req.body.ID_proveedor;
   sql = `DELETE * FROM Proveedor WHERE ID_proveedor = '${id}'`;
@@ -261,6 +287,8 @@ router.post("/addProveedor", async (req, res) => {
     });
   }
 });
+
+
 
 //CRUD PARA CLIENTE
 router.get("/getCliente", async (req, res) => {
