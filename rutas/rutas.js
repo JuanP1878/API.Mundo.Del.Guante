@@ -36,8 +36,8 @@ router.get("/getOrdenCompra", async (req, res) => {
   res.json(Orders);
 });
 
-router.delete("/deleteOrdenCompra", async (req, res) => {
-  let ID_orden_C = req.body.ID_orden_C;
+router.delete("/deleteOrdenCompra/:ID_orden_C", async (req, res) => {
+  let ID_orden_C = req.params[ID_orden_C];
   sql = `DELETE * FROM Orden_de_Compra WHERE ID_orden_C = '${ID_orden_C}'`;
   let result = await BD.Open(sql, [], true);
   if (result.rowsAffected >= 1) {
@@ -118,8 +118,8 @@ router.get("/getOrdenEnvio", async (req, res) => {
   res.json(Orders);
 });
 
-router.delete("/deleteOrdenEnvio", async (req, res) => {
-  let id = req.body.ID_orden_envio;
+router.delete("/deleteOrdenEnvio/:ID_orden_envio", async (req, res) => {
+  let id = req.params[ID_orden_envio];
   sql = `DELETE * FROM Orden_de_Envio WHERE ID_orden_envio = '${id}'`;
   let result = await BD.Open(sql, [], true);
   if (result.rowsAffected >= 1) {
@@ -225,8 +225,8 @@ router.get("/getProductosProveedor", async (req, res) => {
   res.json(Productos);
 });
 
-router.delete("/deleteProveedor", async (req, res) => {
-  let id = req.body.ID_proveedor;
+router.delete("/deleteProveedor/:ID_proveedor", async (req, res) => {
+  let id = req.params.ID_proveedor;
   sql = `DELETE * FROM Proveedor WHERE ID_proveedor = '${id}'`;
   let result = await BD.Open(sql, [], true);
   if (result.rowsAffected >= 1) {
@@ -289,7 +289,6 @@ router.post("/addProveedor", async (req, res) => {
 });
 
 
-
 //CRUD PARA CLIENTE
 router.get("/getCliente", async (req, res) => {
   sql = "select * from Cliente";
@@ -310,8 +309,8 @@ router.get("/getCliente", async (req, res) => {
   res.json(Cliente);
 });
 
-router.delete("/deleteCliente", async (req, res) => {
-  let id = req.body.ID_cliente;
+router.delete("/deleteCliente/:ID_cliente", async (req, res) => {
+  let id = req.params.ID_cliente;
   sql = `DELETE * FROM Cliente WHERE ID_cliente = '${id}'`;
   let result = await BD.Open(sql, [], true);
   if (result.rowsAffected >= 1) {
@@ -350,13 +349,13 @@ router.put("/updateCliente", async (req, res) => {
   }
 });
 
-router.post("/addProveedor", async (req, res) => {
-  let ID_cliente = req.body.ID_cliente;
+router.post("/addProveedor/", async (req, res) => {
+  let ID_proveedor = req.body.ID_proveedor;
   let RFC = req.body.RFC;
-  let direccion = req.body.direccion;
+  let telefono = req.body.telefono;
   let nombre = req.body.nombre;
 
-  sql = `INSERT INTO Proveedor VALUES('${ID_cliente}', '${RFC}', '${direccion}','${nombre}')`;
+  sql = `INSERT INTO Proveedor VALUES('${ID_proveedor}', '${RFC}', '${telefono}','${nombre}')`;
   let result = await BD.Open(sql, [], true);
   //console.log(sql); //
   //console.log("Number of rows modified:", result.rowsAffected);
@@ -391,7 +390,7 @@ router.get("/getVendedor", async (req, res) => {
   res.json(Vendedor);
 });
 
-router.delete("/deletVendedor", async (req, res) => {
+router.delete("/deleteVendedor/:ID_vendedor", async (req, res) => {
   let id = req.body.ID_vendedor;
   sql = `DELETE * FROM Vendedor WHERE ID_vendedor = '${id}'`;
   let result = await BD.Open(sql, [], true);
@@ -469,8 +468,8 @@ router.get("/getProducto", async (req, res) => {
   res.json(Producto);
 });
 
-router.delete("/deleteProducto", async (req, res) => {
-  let id = req.body.ID_producto;
+router.delete("/deleteProducto/:ID_producto", async (req, res) => {
+  let id = req.params.ID_producto;
   sql = `DELETE * FROM Producto WHERE ID_producto = '${id}'`;
   let result = await BD.Open(sql, [], true);
   if (result.rowsAffected >= 1) {
@@ -548,8 +547,8 @@ router.get("/getVehiculo", async (req, res) => {
   res.json(Vehiculos);
 });
 
-router.delete("/deleteVehiculo", async (req, res) => {
-  let id = req.body.ID_vehiculo;
+router.delete("/deleteVehiculo/:ID_vehiculo", async (req, res) => {
+  let id = req.params.ID_vehiculo;
   sql = `DELETE * FROM Vehiculo WHERE ID_vehiculo = '${id}'`;
   let result = await BD.Open(sql, [], true);
   if (result.rowsAffected >= 1) {
