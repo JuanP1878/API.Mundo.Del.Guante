@@ -609,4 +609,44 @@ router.post("/addVehiculo", async (req, res) => {
 });
 
 
+//Prueba Triger 1 Aumento Precio
+router.put("/updatePrecioProducto", async (req, res) => {
+  let ID_proveedor = req.body.ID_proveedor;
+  let ID_producto = req.body.ID_producto;
+  let precio = req.body.precio
+  let result
+  sql = `UPDATE puede_surtir SET precio=${precio} WHERE id_producto = '${ID_producto}' and id_proveedor = '${ID_proveedor}'`;
+  //console.log(sql);
+  try {
+    result = await BD.Open(sql,{},true);
+    console.log("try")
+    if (result.rowsAffected >= 1) {
+      res.json({
+        status: "success",
+        message: "Number of rows modified: " + result.rowsAffected,
+      });
+    } else {
+      res.json({
+        status: "error",
+        message: "An error has occurred",
+      });
+    }
+  } catch (error) {
+    console.log(error.errorNum);
+    if(error.errorNum == 20600){
+      res.json({
+        status: "error",
+        message: "An error has occurred, trigger activado no puedes aumentar el precio más de un 50%",
+      });
+    }else{
+      res.json({
+        status: "error",
+        message: "An error has occurred",
+      });
+    }
+  }
+});
+
+
+
 module.exports = router;
