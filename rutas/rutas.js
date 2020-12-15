@@ -611,6 +611,25 @@ router.post("/addVehiculo", async (req, res) => {
 });
 
 
+//Servicios de paqueteria
+router.get("/getServiciosPaqueria", async (req, res) => {
+  sql = "select * from Servicio_Paqueteria";
+
+  let result = await BD.Open(sql, [], true);
+  Paqueteria = [];
+
+  result.rows.map((paq) => {
+    let vehiculoSchema = {
+      ID_paqueteria: paq[0],
+      direccion : paq[1]
+    };
+    Paqueteria.push(vehiculoSchema);
+  });
+  //console.log(Orders);
+  res.json(Paqueteria);
+});
+
+
 //Prueba Triger 1 Aumento Precio
 router.put("/updatePrecioProducto", async (req, res) => {
   let ID_proveedor = req.body.ID_proveedor;
