@@ -229,8 +229,10 @@ router.get("/getProductosProveedor", async (req, res) => {
 
 router.post("/deleteProveedor", async (req, res) => {
   let id = req.body.ID_proveedor;
-  sql = `DELETE * FROM Proveedor WHERE ID_proveedor = '${id}'`;
-  let result = await BD.Open(sql, [], true);
+  sql = `DELETE FROM Proveedor WHERE ID_proveedor = '${id}'`;
+  let result;
+  try{
+    result = await BD.Open(sql, [], true);
   if (result.rowsAffected >= 1) {
     res.json({
       status: "success",
@@ -242,6 +244,7 @@ router.post("/deleteProveedor", async (req, res) => {
       message: "An error has occurred",
     });
   }
+}catch(error){console.log(error)}
 });
 
 router.put("/updateProveedor", async (req, res) => {
@@ -268,15 +271,13 @@ router.put("/updateProveedor", async (req, res) => {
 });
 
 router.post("/addProveedor", async (req, res) => {
-  let ID_proveedor = req.body.ID_proveedor;
   let RFC = req.body.RFC;
   let telefono = req.body.telefono;
   let nombre = req.body.nombre;
 
-  sql = `INSERT INTO Proveedor VALUES('${ID_proveedor}', '${RFC}', '${telefono}','${nombre}')`;
-  let result = await BD.Open(sql, [], true);
-  //console.log(sql); //
-  //console.log("Number of rows modified:", result.rowsAffected);
+  sql = `INSERT INTO Proveedor VALUES(id_seq_proveedor.nextval, '${RFC}', '${telefono}','${nombre}')`;
+  try{
+    result = await BD.Open(sql, [], true);
   if (result.rowsAffected >= 1) {
     res.json({
       status: "success",
@@ -288,6 +289,7 @@ router.post("/addProveedor", async (req, res) => {
       message: "An error has occurred",
     });
   }
+}catch(error){console.log(error)}
 });
 
 
@@ -313,8 +315,9 @@ router.get("/getCliente", async (req, res) => {
 
 router.post("/deleteCliente", async (req, res) => {
   let id = req.body.ID_cliente;
-  sql = `DELETE * FROM Cliente WHERE ID_cliente = '${id}'`;
+  sql = `DELETE FROM Cliente WHERE ID_cliente = '${id}'`;
   let result = await BD.Open(sql, [], true);
+  console.log(sql);
   if (result.rowsAffected >= 1) {
     res.json({
       status: "success",
@@ -334,10 +337,11 @@ router.put("/updateCliente", async (req, res) => {
   let direccion = req.body.direccion;
   let nombre = req.body.nombre;
 
-  sql = `UPDATE Cliente SET RFC = '${RFC}', direccion = '${direccion}', nombre = '${nombre}' WHERE ID_cliente = '${ID_cliente}'`;
-  let result = await BD.Open(sql, [], true);
-  //console.log(sql); //
-  //console.log("Number of rows modified:", result.rowsAffected);
+  sql = `UPDATE Cliente SET RFC = '${RFC}', dirección = '${direccion}', nombre = '${nombre}' WHERE ID_cliente = '${ID_cliente}'`;
+  let result;
+  console.log(sql)
+  try{
+    result = await BD.Open(sql, [], true);
   if (result.rowsAffected >= 1) {
     res.json({
       status: "success",
@@ -349,28 +353,34 @@ router.put("/updateCliente", async (req, res) => {
       message: "An error has occurred",
     });
   }
+}catch(error){console.log(error)}
 });
 
-router.post("/addProveedor/", async (req, res) => {
-  let ID_proveedor = req.body.ID_proveedor;
+router.post("/addCliente/", async (req, res) => {
+  let ID_cliente = req.body.ID_cliente;
   let RFC = req.body.RFC;
-  let telefono = req.body.telefono;
+  let direccion = req.body.direccion;
   let nombre = req.body.nombre;
 
-  sql = `INSERT INTO Proveedor VALUES('${ID_proveedor}', '${RFC}', '${telefono}','${nombre}')`;
-  let result = await BD.Open(sql, [], true);
-  //console.log(sql); //
-  //console.log("Number of rows modified:", result.rowsAffected);
-  if (result.rowsAffected >= 1) {
-    res.json({
-      status: "success",
-      message: "Number of rows modified: " + result.rowsAffected,
-    });
-  } else {
-    res.json({
-      status: "error",
-      message: "An error has occurred",
-    });
+  sql = `INSERT INTO Cliente VALUES(id_seq_cliente.nextval,'${RFC}', '${direccion}','${nombre}')`;
+  let result;
+  try{
+    result = await BD.Open(sql, [], true);
+    //console.log(sql); //
+    //console.log("Number of rows modified:", result.rowsAffected);
+    if (result.rowsAffected >= 1) {
+      res.json({
+        status: "success",
+        message: "Number of rows modified: " + result.rowsAffected,
+      });
+    } else {
+      res.json({
+        status: "error",
+        message: "An error has occurred",
+      });
+    }
+  }catch(error){
+    console.log(error);
   }
 });
 
@@ -394,8 +404,11 @@ router.get("/getVendedor", async (req, res) => {
 
 router.post("/deleteVendedor", async (req, res) => {
   let id = req.body.ID_vendedor;
-  sql = `DELETE * FROM Vendedor WHERE ID_vendedor = '${id}'`;
-  let result = await BD.Open(sql, [], true);
+  sql = `DELETE FROM Vendedor WHERE ID_vendedor = '${id}'`;
+  let result;
+  try{
+  result = await BD.Open(sql, [], true);
+  console.log(result);
   if (result.rowsAffected >= 1) {
     res.json({
       status: "success",
@@ -407,16 +420,17 @@ router.post("/deleteVendedor", async (req, res) => {
       message: "An error has occurred",
     });
   }
+}catch(error){console.log(error)}
 });
 
 router.put("/updateVendedor", async (req, res) => {
   let ID_vendedor = req.body.ID_vendedor;
   let nombre = req.body.nombre;
 
-  sql = `UPDATE Vendedor SET nombre = '${nombre}' WHERE ID_cliente = '${ID_vendedor}'`;
-  let result = await BD.Open(sql, [], true);
-  //console.log(sql); //
-  //console.log("Number of rows modified:", result.rowsAffected);
+  sql = `UPDATE Vendedor SET nombre = '${nombre}' WHERE ID_vendedor = '${ID_vendedor}'`;
+  let result;
+  try{
+    result = await BD.Open(sql, [], true);
   if (result.rowsAffected >= 1) {
     res.json({
       status: "success",
@@ -428,13 +442,14 @@ router.put("/updateVendedor", async (req, res) => {
       message: "An error has occurred",
     });
   }
+}catch(error){console.log(error)}
 });
 
 router.post("/addVendedor", async (req, res) => {
   let ID_vendedor = req.body.ID_vendedor;
   let nombre = req.body.nombre;
 
-  sql = `INSER INTO Vendedor VALUES('${ID_vendedor}','${nombre}'`;
+  sql = `INSERT INTO Vendedor VALUES(id_seq_vendedor.nextval,'${nombre}')`;
   let result = await BD.Open(sql, [], true);
   //console.log(sql); //
   //console.log("Number of rows modified:", result.rowsAffected);
@@ -472,30 +487,34 @@ router.get("/getProducto", async (req, res) => {
 
 router.post("/deleteProducto", async (req, res) => {
   let id = req.body.ID_producto;
-  sql = `DELETE * FROM Producto WHERE ID_producto = '${id}'`;
-  let result = await BD.Open(sql, [], true);
-  if (result.rowsAffected >= 1) {
-    res.json({
-      status: "success",
-      message: "Number of rows modified: " + result.rowsAffected,
-    });
-  } else {
-    res.json({
-      status: "error",
-      message: "An error has occurred",
-    });
+  sql = `DELETE FROM Producto WHERE ID_producto = '${id}'`;
+  let result
+  try{
+    result = await BD.Open(sql, [], true);
+    if (result.rowsAffected >= 1) {
+      res.json({
+        status: "success",
+        message: "Number of rows modified: " + result.rowsAffected,
+      });
+    } else {
+      res.json({
+        status: "error",
+        message: "An error has occurred",
+      });
   }
+  }catch(error){}
 });
 
 router.put("/updateProducto", async (req, res) => {
   let ID_producto = req.body.ID_producto;
   let nombre = req.body.nombre;
-  let cantidad = req.body.cantidad
+  let cantidad = req.body.cantidad;
 
-  sql = `UPDATE Producto SET nombre = '${nombre}', cantidad = '${cantidad}'WHERE ID_producto = '${ID_producto}'`;
-  let result = await BD.Open(sql, [], true);
-  //console.log(sql); //
-  //console.log("Number of rows modified:", result.rowsAffected);
+  sql = `UPDATE Producto SET nombre = '${nombre}', cantidad = '${cantidad}' WHERE ID_producto = '${ID_producto}'`;
+  let result;
+  try{
+    result = await BD.Open(sql, [], true);
+    console.log(result);
   if (result.rowsAffected >= 1) {
     res.json({
       status: "success",
@@ -503,20 +522,20 @@ router.put("/updateProducto", async (req, res) => {
     });
   } else {
     res.json({
-      status: "error",
+      status: "error", 
       message: "An error has occurred",
     });
   }
+}catch(error){console.log(error)}
 });
 
 router.post("/addProducto", async (req, res) => {
   let ID_producto = req.body.ID_producto;
   let nombre = req.body.nombre;
-
-  sql = `INSERT INTO Producto VALUES(id_seq_producto.nextval,'${nombre}',100)`;
-  let result = await BD.Open(sql, [], true);
-  //console.log(sql); //
-  //console.log("Number of rows modified:", result.rowsAffected);
+  sql = `INSERT INTO producto VALUES(id_seq_producto.nextval,'${nombre}',0)`;
+  let result;
+  try{
+  result = await BD.Open(sql, [], true);
   if (result.rowsAffected >= 1) {
     res.json({
       status: "success",
@@ -528,6 +547,7 @@ router.post("/addProducto", async (req, res) => {
       message: "An error has occurred",
     });
   }
+}catch(error){}
 });
 
 //CRUD PARA VEHICULO
@@ -551,7 +571,7 @@ router.get("/getVehiculo", async (req, res) => {
 
 router.post("/deleteVehiculo", async (req, res) => {
   let id = req.body.ID_vehiculo;
-  sql = `DELETE * FROM Vehiculo WHERE ID_vehiculo = '${id}'`;
+  sql = `DELETE FROM Vehiculo WHERE ID_vehiculo = '${id}'`;
   let result = await BD.Open(sql, [], true);
   if (result.rowsAffected >= 1) {
     res.json({
@@ -572,9 +592,9 @@ router.put("/updateVehiculo", async (req, res) => {
   let marca = req.body.marca;
 
   sql = `UPDATE Vehiculo SET modelo = '${modelo}', marca = '${marca}' WHERE ID_vehiculo = '${ID_vehiculo}'`;
-  let result = await BD.Open(sql, [], true);
-  //console.log(sql); //
-  //console.log("Number of rows modified:", result.rowsAffected);
+  let result;
+  try{
+    result = await BD.Open(sql, [], true);
   if (result.rowsAffected >= 1) {
     res.json({
       status: "success",
@@ -586,6 +606,7 @@ router.put("/updateVehiculo", async (req, res) => {
       message: "An error has occurred",
     });
   }
+}catch(error){console.log(error)}
 });
 
 router.post("/addVehiculo", async (req, res) => {
@@ -593,7 +614,7 @@ router.post("/addVehiculo", async (req, res) => {
   let modelo = req.body.modelo;
   let marca = req.body.marca;
 
-  sql = `INSERT INTO Vehiculo VALUES ('${ID_vehiculo}','${modelo}', '${marca}')`;
+  sql = `INSERT INTO Vehiculo VALUES (id_seq_vehiculo.NEXTVAL,'${modelo}', '${marca}')`;
   let result = await BD.Open(sql, [], true);
   //console.log(sql); //
   //console.log("Number of rows modified:", result.rowsAffected);
