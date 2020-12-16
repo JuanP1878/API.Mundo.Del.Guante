@@ -513,7 +513,7 @@ router.post("/addProducto", async (req, res) => {
   let ID_producto = req.body.ID_producto;
   let nombre = req.body.nombre;
 
-  sql = `INSER INTO Vendedor VALUES('${ID_producto}','${nombre}'`;
+  sql = `INSERT INTO Producto VALUES(id_seq_producto.nextval,'${nombre}',100)`;
   let result = await BD.Open(sql, [], true);
   //console.log(sql); //
   //console.log("Number of rows modified:", result.rowsAffected);
@@ -629,6 +629,67 @@ router.get("/getServiciosPaqueria", async (req, res) => {
   res.json(Paqueteria);
 });
 
+router.post("/deleteServiciosPaqueria", async (req, res) => {
+  let id = req.body.ID_paqueteria;
+  sql = `DELETE * FROM Vehiculo WHERE ID_paqueteria = '${id}'`;
+  let result = await BD.Open(sql, [], true);
+  if (result.rowsAffected >= 1) {
+    res.json({
+      status: "success",
+      message: "Number of rows modified: " + result.rowsAffected,
+    });
+  } else {
+    res.json({
+      status: "error",
+      message: "An error has occurred",
+    });
+  }
+});
+
+router.put("/updateServiciosPaqueria", async (req, res) => {
+  let ID_paqueteria = req.body.ID_paqueteria;
+  let direccion = req.body.direccion;
+
+  sql = `UPDATE Vehiculo SET direccion = '${direccion}' WHERE ID_paqueteria = '${ID_paqueteria}'`;
+  let result = await BD.Open(sql, [], true);
+  //console.log(sql); //
+  //console.log("Number of rows modified:", result.rowsAffected);
+  if (result.rowsAffected >= 1) {
+    res.json({
+      status: "success",
+      message: "Number of rows modified: " + result.rowsAffected,
+    });
+  } else {
+    res.json({
+      status: "error",
+      message: "An error has occurred",
+    });
+  }
+});
+
+router.post("/addServiciosPaqueria", async (req, res) => {
+  let direccion = req.body.direccion;
+
+  sql = `INSERT INTO Servicio_Paqueteria VALUES ( id_seq_paqueteria.nextval,'${direccion}')`;
+  let result = await BD.Open(sql, [], true);
+  //console.log(sql); //
+  //console.log("Number of rows modified:", result.rowsAffected);
+  if (result.rowsAffected >= 1) {
+    res.json({
+      status: "success",
+      message: "Number of rows modified: " + result.rowsAffected,
+    });
+  } else {
+    res.json({
+      status: "error",
+      message: "An error has occurred",
+    });
+  }
+});
+
+
+
+
 
 //Prueba Triger 1 Aumento Precio
 router.put("/updatePrecioProducto", async (req, res) => {
@@ -666,6 +727,45 @@ router.put("/updatePrecioProducto", async (req, res) => {
       });
     }
   }
+
+
+});
+
+
+//VIEW 1 Retorna la cantidad de coches que hay por marca
+router.get("/getMarcaCoches", async (req, res) => {
+  sql = "select * from marcaCoches";
+
+  let result = await BD.Open(sql, [], true);
+  Vehiculos = [];
+
+  result.rows.map((paq) => {
+    let vehiculoSchema = {
+      cantidad: paq[0],
+      marca : paq[1]
+    };
+    Vehiculos.push(vehiculoSchema);
+  });
+  //console.log(Orders);
+  res.json(Vehiculos);
+});
+
+//VIEW 1 Retorna la cantidad de coches que hay por marca
+router.get("/getMarcaCoches", async (req, res) => {
+  sql = "select * from marcaCoches";
+
+  let result = await BD.Open(sql, [], true);
+  Vehiculos = [];
+
+  result.rows.map((paq) => {
+    let vehiculoSchema = {
+      cantidad: paq[0],
+      marca : paq[1]
+    };
+    Vehiculos.push(vehiculoSchema);
+  });
+  //console.log(Orders);
+  res.json(Vehiculos);
 });
 
 
