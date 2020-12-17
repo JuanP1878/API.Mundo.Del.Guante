@@ -201,10 +201,10 @@ router.get("/getProveedor", async (req, res) => {
   res.json(Proveedor);
 });
 
-router.get("/getProductosProveedor", async (req, res) => {
+router.post("/getProductosProveedor", async (req, res) => {
   let ID_proveedor = req.body.ID_proveedor;
-  sql = `Select * from Puede_Surtir WHERE ID_proveedor = ${ID_proveedor}`;
-
+  sql = `Select * from Puede_Surtir WHERE ID_proveedor = '${ID_proveedor}'`;
+  console.log(ID_proveedor)
   let result = await BD.Open(sql, [], true);
   Productos = [];
 
@@ -226,6 +226,30 @@ router.get("/getProductosProveedor", async (req, res) => {
   //console.log(Productos);
   res.json(Productos);
 });
+
+router.post("/getProductosAdqui", async (req, res) => {
+  let ID_orden_A = req.body.ID_orden_a;
+  console.log(ID_orden_A)
+  sql = `Select * from Contiene WHERE ID_orden_A = '${ID_orden_A}'`;
+
+  let result;
+  try{
+    result = await BD.Open(sql, [], true);
+  Productos = [];
+
+  result.rows.map((prov) => {
+    let provSchema = {
+      ID_producto: prov[0],
+      cantidad : prov[2],
+    };
+    Productos.push(provSchema);
+  });
+
+console.log(Productos);
+res.json(Productos);}
+catch(error){console.log(error)}
+});
+  
 
 router.post("/deleteProveedor", async (req, res) => {
   let id = req.body.ID_proveedor;
@@ -671,8 +695,10 @@ router.put("/updateServiciosPaqueria", async (req, res) => {
   let ID_paqueteria = req.body.ID_paqueteria;
   let direccion = req.body.direccion;
 
-  sql = `UPDATE Vehiculo SET direccion = '${direccion}' WHERE ID_paqueteria = '${ID_paqueteria}'`;
-  let result = await BD.Open(sql, [], true);
+  sql = `UPDATE Servicio_Paqueteria SET direccion = '${direccion}' WHERE ID_paqueteria = '${ID_paqueteria}'`;
+  let result;
+  try{
+    result = await BD.Open(sql, [], true);
   //console.log(sql); //
   //console.log("Number of rows modified:", result.rowsAffected);
   if (result.rowsAffected >= 1) {
@@ -686,6 +712,7 @@ router.put("/updateServiciosPaqueria", async (req, res) => {
       message: "An error has occurred",
     });
   }
+}catch(error){console.log(error)}
 });
 
 router.post("/addServiciosPaqueria", async (req, res) => {
@@ -772,23 +799,255 @@ router.get("/getMarcaCoches", async (req, res) => {
 });
 
 //VIEW 1 Retorna la cantidad de coches que hay por marca
-router.get("/getMarcaCoches", async (req, res) => {
-  sql = "select * from marcaCoches";
+router.get("/getLocales", async (req, res) => {
+  sql = "select * from envioslocal";
 
   let result = await BD.Open(sql, [], true);
-  Vehiculos = [];
+  envios = [];
 
   result.rows.map((paq) => {
-    let vehiculoSchema = {
-      cantidad: paq[0],
-      marca : paq[1]
+    let envio = {
+      ID_orden_envio: paq[0],
+      fecha : paq[1],
+      ID_orden_C: paq[2]
     };
-    Vehiculos.push(vehiculoSchema);
+    envios.push(envio);
   });
   //console.log(Orders);
-  res.json(Vehiculos);
+  res.json(envios);
 });
 
+router.get("/getForaneos", async (req, res) => {
+  sql = "select * from enviosforaneos";
 
+  let result = await BD.Open(sql, [], true);
+  envios = [];
+
+  result.rows.map((paq) => {
+    let envio = {
+      ID_orden_envio: paq[0],
+      fecha : paq[1],
+      ID_orden_C: paq[2]
+    };
+    envios.push(envio);
+  });
+  res.json(envios);
+});
+
+//Crud para tabla PuedeSurtir
+router.post("/addPuedeSurtir", async (req, res) => {
+  let ID_proveedor = req.body.ID_proveedor;
+  let ID_producto = req.body.ID_producto;
+  let precio = req.body.precio
+
+  sql = `INSERT INTO Puede_Surtir VALUES (${ID_proveedor},'${ID_producto}', '${precio}')`;
+  let result = await BD.Open(sql, [], true);
+  //console.log(sql); //
+  //console.log("Number of rows modified:", result.rowsAffected);
+  if (result.rowsAffected >= 1) {
+    res.json({
+      status: "success",
+      message: "Number of rows modified: " + result.rowsAffected,
+    });
+  } else {
+    res.json({
+      status: "error",
+      message: "An error has occurred",
+    });
+  }
+});
+
+router.put("/updatePuedeSurtir", async (req, res) => {
+  let ID_proveedor = req.body.ID_proveedor;
+  let ID_producto = req.body.ID_producto;
+  let precio = req.body.precio;
+
+  sql = `UPDATE Puede_Surtir SET precio='${precio}' WHERE ID_producto = '${ID_producto}' and ID_Proveedor = '${ID_proveedor}'`;
+  let result;
+  try {
+    result = await BD.Open(sql,{},true);
+    if (result.rowsAffected >= 1) {
+      res.json({
+        status: "success",
+        message: "Number of rows modified: " + result.rowsAffected,
+      });
+    } else {
+      res.json({
+        status: "error",
+        message: "An error has occurred",
+      });
+    }
+  } catch (error) {
+    if(error.errorNum == 20600){
+      res.json({
+        status: "errorT",
+        message: "An error has occurred, trigger activado no puedes aumentar el precio más de un 50%",
+      });
+    }else{
+      res.json({
+        status: "error",
+        message: "An error has occurred",
+      });
+    }
+  }
+
+});
+
+router.post("/deletePuedeSurtir", async (req, res) => {
+  let ID_proveedor = req.body.ID_proveedor;
+  let ID_producto = req.body.ID_producto;
+  sql = `DELETE FROM Puede_Surtir WHERE ID_proveedor = '${ID_proveedor}' AND ID_producto = '${ID_producto}'`;
+  let result;
+  try{
+    result = await BD.Open(sql, [], true);
+  if (result.rowsAffected >= 1) {
+    res.json({
+      status: "success",
+      message: "Number of rows modified: " + result.rowsAffected,
+    });
+  } else {
+    res.json({
+      status: "error",
+      message: "An error has occurred",
+    });
+  }
+}catch(error){console.log(error)}
+});
+
+//CRUD PARA ORDEN DE Adquisicion
+router.get("/getOrdenAdqui", async (req, res) => {
+  sql = "select * from Orden_de_Adquisicion";
+
+  let result = await BD.Open(sql, [], true);
+  Orders = [];
+  result.rows.map((order) => {
+    let orderSchema = {
+      ID_orden_A: order[0],
+      fecha_estimada: order[1],
+      ID_veendedor: order[2],
+      ID_proveedor: order[3],
+    };
+    Orders.push(orderSchema);
+  });
+  
+  /*let result2 = await BD.Open(sql, [], true);
+  for(const order of Orders){
+    sql = `select ID_orden_envio from Orden_de_Envio WHERE ID_orden_C = '${order.ID_orden_C}'`;
+
+    let result = await BD.Open(sql, [], true);
+    order.ID_orden_envio = String(result.rows[0])
+    //console.log(String(result.rows[0]))
+  }*/
+  //console.log(Orders)
+  res.json(Orders);
+});
+
+router.post("/deleteOrdenAdqui", async (req, res) => {
+  let ID_orden_A = req.body.ID_orden_A;
+  
+  sql = `delete from Orden_de_Adquisicion where ID_orden_A = '${ID_orden_A}'`;
+  console.log(sql)
+  let result = await BD.Open(sql, [], true);
+  if (result.rowsAffected >= 1) {
+    res.json({
+      status: "success",
+      message: "Number of rows modified: " + result.rowsAffected,
+    });
+  } else {
+    res.json({
+      status: "error",
+      message: "An error has occurred",
+    });
+  }
+});
+
+router.post("/addOrdenAdqui",async(req,res) =>{
+  let ID_vendedor = req.body.ID_vendedor;
+  let ID_proveedor = req.body.ID_proveedor;
+
+  sql = `INSERT INTO Orden_de_Adquisicion VALUES (id_seq_adqui.nextval,sysdate, '${ID_vendedor}', '${ID_proveedor}')`;
+  let result;
+  try{
+      result = await BD.Open(sql, [], true);
+      console.log(result)
+    //console.log(sql); //
+    //console.log("Number of rows modified:", result.rowsAffected);
+    if (result.rowsAffected >= 1) {
+      res.json({
+        status: "success",
+        message: "Number of rows modified: " + result.rowsAffected,
+      });
+    } else {
+      res.json({
+        status: "error",
+        message: "An error has occurred",
+      });}
+  }catch(error){console.log(error)}
+});
+
+router.post("/addContiene",async(req,res) =>{
+  let ID_producto = req.body.ID_producto;
+  let ID_orden_a = req.body.ID_orden_a;
+  let cantidad = req.body.cantidad;
+
+  sql = `INSERT INTO Contiene VALUES ('${ID_producto}', '${ID_orden_a}', '${cantidad}')`;
+  let result;
+  try{
+      result = await BD.Open(sql, [], true);
+      console.log(result)
+    //console.log(sql); //
+    //console.log("Number of rows modified:", result.rowsAffected);
+    if (result.rowsAffected >= 1) {
+      res.json({
+        status: "success",
+        message: "Number of rows modified: " + result.rowsAffected,
+      });
+    } else {
+      res.json({
+        status: "error",
+        message: "An error has occurred",
+      });}
+  }catch(error){console.log(error)}
+});
+
+//Funciones
+
+router.post("/getProveedoresCount", async (req, res) => {
+  let ID_proveedor = req.body.ID_proveedor;
+  sql = "select totalProveedores() from dual";
+  let result;
+  Proveedores = [];
+
+  try {
+    result = await BD.Open(sql, [], true);
+    // console.log(result.rows[0])
+    res.json({ cantProveedores: parseInt(result.rows[0]) });
+  } catch (error) {
+    console.log(error);
+    res.json({
+      status: "error",
+      message: "An error has occurred",
+    });
+  }
+});
+
+//Llamar a funcion getAllProveedores
+router.get("/getAllClientesCount", async (req, res) => {
+  sql = "select totalClientes() from dual";
+  let result;
+  Proveedores = [];
+
+  try {
+    result = await BD.Open(sql, [], true);
+    //console.log(result.rows[0])
+    res.json({ cantClientes: parseInt(result.rows[0]) });
+  } catch (error) {
+    console.log(error);
+    res.json({
+      status: "error",
+      message: "An error has occurred",
+    });
+  }
+});
 
 module.exports = router;
